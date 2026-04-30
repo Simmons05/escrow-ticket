@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>ARIRANG · Real-Time Dual Interface | Seller + Buyer Chat</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #f0f2f8;
+      font-family: 'Inter', sans-serif;
+      padding: 24px 20px;
+      color: #0a0c10;
+    }
+    .app-header {
+      max-width: 1500px;
+      margin: 0 auto 24px auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .logo-area h1 {
+      font-size: 1.6rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #141b2b, #2a3348);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .role-switch {
+      display: flex;
+      background: white;
+      border-radius: 60px;
+      padding: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .role-btn {
+      padding: 10px 28px;
+      border-radius: 60px;
+      border: none;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s;
+      background: transparent;
+      font-size: 0.9rem;
+    }
+    .role-btn.active { background: #1f5e3a; color: white; }
+    .live-time { font-family: monospace; font-size: 0.7rem; background: #f0f3f9; padding: 4px 12px; border-radius: 30px; }
+    .app-container {
+      max-width: 1500px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 28px;
+      align-items: flex-start;
+    }
+    .panel {
+      background: white;
+      border-radius: 36px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.06);
+      overflow: hidden;
+      transition: all 0.2s;
+    }
+    .ticket-panel { flex: 2; min-width: 320px; }
+    .chat-panel { flex: 1.4; min-width: 360px; display: flex; flex-direction: column; height: 700px; }
+    .panel-header {
+      padding: 18px 26px;
+      background: white;
+      border-bottom: 1px solid #eef2f6;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .role-badge {
+      background: #1f5e3a10;
+      padding: 6px 14px;
+      border-radius: 60px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+    .ticket-hero {
+      background: linear-gradient(115deg, #0a0f1c 0%, #1a1f30 100%);
+      padding: 28px 26px;
+      color: white;
+    }
+    .tour-badge {
+      display: inline-block;
+      background: rgba(255,200,50,0.18);
+      padding: 5px 14px;
+      border-radius: 60px;
+      font-size: 0.7rem;
+      margin-bottom: 16px;
+    }
+    .ticket-title { font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; }
+    .event-meta { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 18px; }
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      background: rgba(255,255,255,0.08);
+      padding: 6px 14px;
+      border-radius: 40px;
+    }
+    .japanese-details {
+      padding: 20px 26px;
+      border-bottom: 1px solid #edeff2;
+      background: #fefefe;
+    }
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px dashed #eef2f8;
+      font-size: 0.85rem;
+    }
+    .price-card {
+      padding: 18px 26px;
+      background: #fafcff;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      border-bottom: 1px solid #edeff2;
+    }
+    .price-amount { font-size: 1.9rem; font-weight: 800; }
+    .seller-actions, .buyer-actions {
+      padding: 20px 26px;
+      background: #ffffff;
+      border-top: 1px solid #eef2f8;
+    }
+    .action-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .btn-primary {
+      background: #1f5e3a;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 40px;
+      font-weight: 600;
+      cursor: pointer;
+      flex: 1;
+      min-width: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-secondary {
+      background: #f0f3f9;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 40px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-warning {
+      background: #e6b422;
+      color: #1a2a1a;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 40px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .step-tabs { display: flex; justify-content: space-between; gap: 6px; flex-wrap: wrap; margin: 12px 0 10px; }
+    .step-tab {
+      flex: 1; text-align: center; background: #f8fafd; padding: 12px 6px; border-radius: 60px;
+      font-size: 0.7rem; font-weight: 600; color: #5b6e8c; border: 1px solid #e4eaf1;
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+    }
+    .step-tab.completed { background: #e4f3e9; border-color: #2c8c5a; color: #1a6e46; }
+    .step-tab.active { background: #1f5e3a; border-color: #1f5e3a; color: white; }
+    .escrow-message { background: #eef6f0; padding: 14px 16px; border-radius: 24px; margin-top: 16px; font-size: 0.8rem; }
+    .escrow-balance {
+      background: #f0f4fa; padding: 12px 16px; border-radius: 20px; margin-top: 12px;
+      display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 500;
+    }
+    /* Real-time Chat Styles */
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      background: #f9fafc;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      min-height: 400px;
+      max-height: 460px;
+    }
+    .empty-chat { text-align: center; color: #9aa9bf; padding: 40px; }
+    .message { display: flex; flex-direction: column; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .message.sent { align-items: flex-end; }
+    .message.received { align-items: flex-start; }
+    .bubble {
+      max-width: 85%;
+      padding: 10px 14px;
+      border-radius: 20px;
+      background: white;
+      font-size: 0.85rem;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+    .sent .bubble { background: #d9f0e3; border-bottom-right-radius: 4px; }
+    .received .bubble { background: white; border: 1px solid #e2e8f0; border-bottom-left-radius: 4px; }
+    .system-message {
+      background: #eef2ff;
+      padding: 8px 14px;
+      border-radius: 24px;
+      font-size: 0.7rem;
+      text-align: center;
+      margin: 4px 0;
+    }
+    .message-time { font-size: 0.65rem; color: #8a99b0; margin-top: 4px; margin-left: 8px; margin-right: 8px; }
+    .chat-input-area {
+      padding: 16px;
+      border-top: 1px solid #edeff2;
+      background: white;
+      display: flex;
+      gap: 10px;
+    }
+    .chat-input-wrapper {
+      flex: 1;
+      display: flex;
+      background: #f8fafc;
+      border-radius: 60px;
+      padding: 4px 8px 4px 16px;
+      border: 1px solid #e2e8f0;
+    }
+    .chat-input-wrapper input {
+      flex: 1;
+      padding: 10px 0;
+      border: none;
+      background: transparent;
+      outline: none;
+      font-size: 0.85rem;
+    }
+    .attachment-btn, .send-btn {
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 50%;
+      transition: 0.2s;
+    }
+    .attachment-btn:hover, .send-btn:hover { background: #eef2fa; }
+    .send-btn { background: #0b2b26; color: white; width: 40px; display: flex; align-items: center; justify-content: center; }
+    .send-btn:hover { background: #1a4a3a; }
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center; z-index: 2000;
+      opacity: 0; visibility: hidden; transition: all 0.3s ease;
+    }
+    .modal-overlay.active { opacity: 1; visibility: visible; }
+    .modal-card { background: white; max-width: 480px; width: 90%; border-radius: 48px; overflow: hidden; }
+    .modal-header { padding: 24px 28px 16px; border-bottom: 1px solid #eef2f8; display: flex; justify-content: space-between; align-items: center; }
+    .modal-body { padding: 24px 28px; }
+    .modal-footer { padding: 16px 28px 28px; display: flex; gap: 12px; }
+    .close-modal { background: #f0f3f9; border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; }
+    .wallet-address { font-family: monospace; font-size: 0.7rem; background: #f1f5f9; padding: 6px 10px; border-radius: 12px; margin-top: 6px; word-break: break-all; }
+    .crypto-option { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 20px; padding: 12px; margin: 12px 0; cursor: pointer; transition: 0.2s; }
+    .crypto-option.selected { background: #e4f3e9; border-color: #1f5e3a; }
+    .input-group { margin-bottom: 16px; }
+    .input-group input, .input-group select { width: 100%; padding: 12px 16px; border: 1.5px solid #e2e8f0; border-radius: 28px; font-size: 0.9rem; }
+    .hidden { display: none; }
+    .online-indicator { font-size: 0.7rem; color: #1f5e3a; display: flex; align-items: center; gap: 4px; }
+    .fa-circle { font-size: 0.5rem; }
+  </style>
+</head>
+<body>
+
+<div class="app-header">
+  <div class="logo-area"><h1><i class="fas fa-ticket-alt"></i> ARIRANG·Escrow</h1></div>
+  <div class="role-switch" id="roleSwitch">
+    <button id="sellerRoleBtn" class="role-btn active">👑 Seller Dashboard</button>
+    <button id="buyerRoleBtn" class="role-btn">🛒 Buyer Dashboard</button>
+  </div>
+  <div class="live-time" id="liveTimeDisplay">--:--:--</div>
+</div>
+
+<div class="app-container">
+  <!-- LEFT PANEL: Ticket Display -->
+  <div class="panel ticket-panel">
+    <div class="panel-header">
+      <span><i class="fas fa-info-circle"></i> Ticket Details</span>
+      <span class="role-badge" id="roleBadge">Seller Mode</span>escrow
+    </div>
+    <div id="ticketPreviewArea">
+      <div class="ticket-hero">
+        <div class="tour-badge"><i class="fas fa-globe-asia"></i> <span id="previewEventName">BTS WORLD TOUR</span></div>
+        <div class="ticket-title" id="previewTitle">ARIRANG · LIVE</div>
+        <div class="event-meta">
+          <div class="meta-item"><i class="far fa-calendar-alt"></i> <span id="previewDate">April 9, 2026</span></div>
+          <div class="meta-item"><i class="fas fa-map-marker-alt"></i> <span id="previewLocation">Goyang Stadium</span></div>
+          <div class="meta-item"><i class="fas fa-chair"></i> <span id="previewTicketType">General Admission</span> × 1</div>
+        </div>
+      </div>
+      <div class="japanese-details">
+        <div class="detail-row"><span>公演名</span><span id="detailEvent">BTS WORLD TOUR</span></div>
+        <div class="detail-row"><span>予約番号</span><span>ESCROW-2026-001</span></div>
+        <div class="detail-row"><span>支払期限</span><span>2026年2月9日(月) 23:00 JST</span></div>
+      </div>
+      <div class="price-card">
+        <div><span class="price-amount" id="displayPrice">100.00</span> <span id="displayCurrency">USD</span></div>
+        <div><i class="fas fa-shield-alt"></i> Crypto Escrow</div>
+      </div>
+    </div>
+    <!-- Seller Actions -->
+    <div id="sellerActionsPanel" class="seller-actions">
+      <h4 style="margin-bottom: 12px;"><i class="fas fa-hammer"></i> Seller Controls</h4>
+      <div class="action-grid">
+        <button id="sellerCreateTicketBtn" class="btn-primary"><i class="fas fa-plus-circle"></i> Create Ticket</button>
+        <button id="sellerConfirmPaymentBtn" class="btn-warning"><i class="fas fa-check-double"></i> Confirm Payment</button>
+        <button id="sellerAttachTicketBtn" class="btn-primary"><i class="fas fa-paperclip"></i> Attach Ticket</button>
+        <button id="sellerSendTicketBtn" class="btn-primary"><i class="fas fa-paper-plane"></i> Send Ticket</button>
+        <button id="sellerResetBtn" class="btn-secondary"><i class="fas fa-undo-alt"></i> Reset Deal</button>
+      </div>
+      <input type="file" id="sellerFileInput" style="display:none" accept=".pdf,.jpg,.png">
+    </div>
+    <!-- Buyer Actions -->
+    <div id="buyerActionsPanel" class="buyer-actions" style="display:none;">
+      <h4 style="margin-bottom: 12px;"><i class="fas fa-shopping-cart"></i> Buyer Controls</h4>
+      <div class="action-grid">
+        <button id="buyerFundEscrowBtn" class="btn-primary"><i class="fab fa-bitcoin"></i> Fund Escrow (Crypto)</button>
+        <button id="buyerConfirmReceiptBtn" class="btn-primary"><i class="fas fa-check-circle"></i> Confirm Receipt & Release</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL: Real-Time Chat + Escrow -->
+  <div class="panel chat-panel">
+    <div class="panel-header">
+      <span><i class="fab fa-ethereum"></i> Escrow Contract</span>
+      <span class="online-indicator"><i class="fas fa-circle" style="color: #1f5e3a;"></i> Live</span>
+    </div>
+    <div style="padding: 20px 24px 0;">
+      <div class="step-tabs" id="stepTabs">
+        <div class="step-tab" data-step="0"><i class="fas fa-handshake"></i> Deal Started</div>
+        <div class="step-tab" data-step="1"><i class="fas fa-dollar-sign"></i> Buyer Paid</div>
+        <div class="step-tab" data-step="2"><i class="fas fa-lock"></i> In Escrow</div>
+        <div class="step-tab" data-step="3"><i class="fas fa-envelope"></i> Ticket Sent</div>
+        <div class="step-tab" data-step="4"><i class="fas fa-check-circle"></i> Completed</div>
+      </div>
+      <div id="escrowMessageBox" class="escrow-message">🚀 Step 1/5: Deal started. Buyer funds escrow.</div>
+      <div class="escrow-balance">
+        <span><i class="fab fa-bitcoin"></i> Escrow Balance:</span>
+        <span id="escrowBalanceDisplay"><strong>$0.00 USD</strong></span>
+        <span><i class="fas fa-step-forward"></i> <span id="stepIndicator">Step 1/5</span></span>
+      </div>
+    </div>
+
+    <!-- Real-Time Chat Area -->
+    <div class="chat-messages" id="chatMessages">
+      <div class="empty-chat"><i class="fas fa-comment-slash"></i> No messages yet<br><span style="font-size:0.7rem;">Start the conversation!</span></div>
+    </div>
+
+    <!-- Chat Input -->
+    <div class="chat-input-area">
+      <div class="chat-input-wrapper">
+        <input type="text" id="chatInput" placeholder="Type a message..." autocomplete="off">
+        <button class="attachment-btn" id="chatAttachBtn" title="Attach file (seller only)"><i class="fas fa-paperclip"></i></button>
+      </div>
+      <button class="send-btn" id="sendMsgBtn"><i class="fas fa-paper-plane"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- Create Ticket Modal -->
+<div id="createTicketModal" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header"><h3><i class="fas fa-ticket-alt"></i> Create Ticket</h3><button id="closeCreateModal" class="close-modal">✕</button></div>
+    <div class="modal-body">
+      <div class="input-group"><input type="text" id="modalEventName" placeholder="Event Name" value="BTS WORLD TOUR"></div>
+      <div class="input-group"><input type="text" id="modalEventDate" placeholder="Date" value="2026-04-09"></div>
+      <div class="input-group"><input type="text" id="modalLocation" placeholder="Location" value="Tokyo Dome"></div>
+      <div class="input-group"><select id="modalTicketType"><option>General Admission</option><option>VIP</option></select></div>
+      <div class="input-group"><input type="number" id="modalPrice" placeholder="Price" value="100"></div>
+    </div>
+    <div class="modal-footer"><button id="cancelCreateModal" class="btn-secondary">Cancel</button><button id="saveCreateModal" class="btn-primary">Create</button></div>
+  </div>
+</div>
+
+<!-- Crypto Fund Modal -->
+<div id="cryptoFundModal" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header"><h3><i class="fab fa-ethereum"></i> Fund Escrow</h3><button id="closeFundModal" class="close-modal">✕</button></div>
+    <div class="modal-body">
+      <p>Deposit <strong id="fundAmount">$100.00</strong> into escrow:</p>
+      <div id="cryptoOptionsList">
+        <div class="crypto-option" data-crypto="ETH"><i class="fab fa-ethereum"></i> Ethereum (ETH)<div class="wallet-address">0xE5c7F3a9B2d4C8e1F6A7b9C2D3E4F5A6B7C8D9E</div></div>
+        <div class="crypto-option" data-crypto="USDC"><i class="fas fa-dollar-sign"></i> USDC (Polygon)<div class="wallet-address">0xA1b2C3d4E5f6G7h8I9j0K1l2M3n4O5p6Q7r8S9t</div></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button id="cancelFundModal" class="btn-secondary">Cancel</button><button id="confirmFundModal" class="btn-primary">I Have Sent Payment</button></div>
+  </div>
+</div>
+
+<script>
+  // ============ GLOBAL STATE (Shared between Seller & Buyer views) ============
+  let currentStep = 0;           // 0=DealStarted, 1=BuyerPaid, 2=InEscrow, 3=TicketSent, 4=Completed
+  let escrowBalance = 0;
+  let currentPrice = 100;
+  let currentCurrency = "USD";
+  let pendingTicketFile = null;
+  let paymentConfirmed = false;   // Seller confirms payment received
+  let selectedCrypto = "ETH";
+  let currentRole = 'seller';
+
+  // ============ REAL-TIME CHAT STORAGE ============
+  let chatMessages = [];  // { type, sender, text, isAttachment, fileName, fileData, time }
+
+  // DOM Elements
+  const sellerPanel = document.getElementById('sellerActionsPanel');
+  const buyerPanel = document.getElementById('buyerActionsPanel');
+  const sellerRoleBtn = document.getElementById('sellerRoleBtn');
+  const buyerRoleBtn = document.getElementById('buyerRoleBtn');
+  const roleBadge = document.getElementById('roleBadge');
+  const stepTabs = document.querySelectorAll('.step-tab');
+  const chatContainer = document.getElementById('chatMessages');
+  const emptyPlaceholder = document.querySelector('.empty-chat');
+  const escrowBalanceSpan = document.getElementById('escrowBalanceDisplay');
+  const stepIndicatorSpan = document.getElementById('stepIndicator');
+  const msgBox = document.getElementById('escrowMessageBox');
+
+  // ============ RENDER CHAT (Real-time updates for both roles) ============
+  function renderChat() {
+    if (!chatContainer) return;
+    chatContainer.innerHTML = '';
+    if (chatMessages.length === 0) {
+      const emptyDiv = document.createElement('div');
+      emptyDiv.className = 'empty-chat';
+      emptyDiv.innerHTML = '<i class="fas fa-comment-slash"></i> No messages yet<br><span style="font-size:0.7rem;">Start the conversation!</span>';
+      chatContainer.appendChild(emptyDiv);
+      return;
+    }
+    chatMessages.forEach(msg => {
+      if (msg.type === 'system') {
+        const div = document.createElement('div');
+        div.className = 'system-message';
+        div.innerHTML = `<i class="fas fa-info-circle"></i> ${msg.text}`;
+        chatContainer.appendChild(div);
+      } else {
+        const msgDiv = document.createElement('div');
+        // Determine if message is from current role's perspective
+        const isFromCurrentUser = (currentRole === 'seller' && msg.sender === 'seller') || (currentRole === 'buyer' && msg.sender === 'buyer');
+        msgDiv.className = `message ${isFromCurrentUser ? 'sent' : 'received'}`;
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        if (msg.isAttachment) {
+          bubble.innerHTML = `<i class="fas fa-file-pdf"></i> <strong>${msg.fileName}</strong><br><span style="font-size:0.7rem;">🎫 Ticket Attachment</span>`;
+          bubble.style.cursor = 'pointer';
+          bubble.onclick = () => { if(msg.fileData) window.open(msg.fileData, '_blank'); else alert("Preview ticket"); };
+        } else {
+          bubble.innerText = msg.text;
+        }
+        msgDiv.appendChild(bubble);
+        const timeSpan = document.createElement('div');
+        timeSpan.className = 'message-time';
+        timeSpan.innerText = msg.time;
+        msgDiv.appendChild(timeSpan);
+        chatContainer.appendChild(msgDiv);
+      }
+    });
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+  }
+
+  function addSystemMessage(text) {
+    chatMessages.push({ type: 'system', text, time: new Date().toLocaleTimeString() });
+    renderChat();
+  }
+
+  function addChatMessage(sender, text, isAttachment = false, fileName = '', fileData = '') {
+    chatMessages.push({
+      type: 'chat',
+      sender: sender,
+      text: text,
+      isAttachment: isAttachment,
+      fileName: fileName,
+      fileData: fileData,
+      time: new Date().toLocaleTimeString()
+    });
+    renderChat();
+  }
+
+  // ============ ESCROW UI UPDATE ============
+  function updateEscrowUI() {
+    stepTabs.forEach((tab, idx) => {
+      tab.classList.remove('completed', 'active');
+      if (idx < currentStep) tab.classList.add('completed');
+      else if (idx === currentStep) tab.classList.add('active');
+    });
+    stepIndicatorSpan.innerText = `Step ${currentStep+1}/5`;
+    escrowBalanceSpan.innerHTML = `<strong>${currentCurrency} ${escrowBalance.toFixed(2)}</strong>`;
+    
+    if (currentStep === 0) msgBox.innerHTML = '🚀 STEP 1: Deal started. Buyer funds escrow.';
+    else if (currentStep === 1) msgBox.innerHTML = '💰 STEP 2: Payment sent. Seller must confirm receipt.';
+    else if (currentStep === 2) msgBox.innerHTML = '🔒 STEP 3: Payment confirmed. Seller sends ticket.';
+    else if (currentStep === 3) msgBox.innerHTML = '📩 STEP 4: Ticket sent. Buyer releases funds.';
+    else msgBox.innerHTML = '✅ STEP 5: Completed! Funds released.';
+  }
+
+  function goToStep(step) {
+    if (step < currentStep) { addSystemMessage(`⚠️ Cannot go back. Use Reset.`); return false; }
+    if (step > currentStep + 1) { addSystemMessage(`❌ Complete step ${currentStep+1} first.`); return false; }
+    
+    if (step === 1 && currentStep === 0 && escrowBalance > 0) {
+      currentStep = 1;
+      updateEscrowUI();
+      addSystemMessage(`✅ Payment detected (${currentCurrency} ${escrowBalance.toFixed(2)}). Awaiting seller confirmation.`);
+      return true;
+    }
+    if (step === 2 && currentStep === 1 && paymentConfirmed) {
+      currentStep = 2;
+      updateEscrowUI();
+      addSystemMessage(`🔒 Seller confirmed payment. Funds locked in escrow.`);
+      return true;
+    }
+    if (step === 3 && currentStep === 2 && pendingTicketFile) {
+      currentStep = 3;
+      updateEscrowUI();
+      addChatMessage('seller', `Ticket delivered: ${pendingTicketFile.name}`, true, pendingTicketFile.name, pendingTicketFile.data);
+      addSystemMessage(`✅ Ticket sent. Buyer can release funds.`);
+      pendingTicketFile = null;
+      return true;
+    }
+    if (step === 4 && currentStep === 3 && escrowBalance > 0) {
+      currentStep = 4;
+      updateEscrowUI();
+      addSystemMessage(`🎉 ESCROW COMPLETED! $${escrowBalance.toFixed(2)} released to seller.`);
+      escrowBalance = 0;
+      escrowBalanceSpan.innerHTML = `<strong>${currentCurrency} 0.00</strong>`;
+      return true;
+    }
+    return false;
+  }
+
+  // ============ SELLER ACTIONS ============
+  function sellerCreateTicket() { document.getElementById('createTicketModal').classList.add('active'); }
+  function sellerConfirmPayment() {
+    if (currentStep === 1 && escrowBalance > 0 && !paymentConfirmed) {
+      paymentConfirmed = true;
+      goToStep(2);
+      addSystemMessage(`Seller confirmed: Payment verified and locked in escrow.`);
+    } else addSystemMessage(`No pending payment to confirm.`);
+  }
+  function sellerAttachTicket() { document.getElementById('sellerFileInput').click(); }
+  function sellerSendTicket() { if (currentStep === 2 && pendingTicketFile) goToStep(3); else addSystemMessage(`Attach ticket file first.`); }
+  function sellerReset() {
+    currentStep = 0;
+    escrowBalance = 0;
+    paymentConfirmed = false;
+    pendingTicketFile = null;
+    updateEscrowUI();
+    addSystemMessage(`🔄 Deal reset to Step 1.`);
+  }
+
+  // ============ BUYER ACTIONS ============
+  function buyerFundEscrow() { if (currentStep !== 0) { addSystemMessage(`Cannot fund now.`); return; } document.getElementById('cryptoFundModal').classList.add('active'); }
+  function processCryptoFund() {
+    escrowBalance = currentPrice;
+    addSystemMessage(`💎 ${selectedCrypto} payment of ${currentCurrency} ${currentPrice.toFixed(2)} sent to escrow.`);
+    goToStep(1);
+    document.getElementById('cryptoFundModal').classList.remove('active');
+  }
+  function buyerConfirmReceipt() { if (currentStep === 3) goToStep(4); else addSystemMessage(`No ticket to confirm.`); }
+
+  // ============ CHAT SEND (Real-time) ============
+  function sendMessage() {
+    const input = document.getElementById('chatInput');
+    const txt = input.value.trim();
+    if (txt === "") return;
+    const sender = currentRole === 'seller' ? 'seller' : 'buyer';
+    addChatMessage(sender, txt);
+    input.value = '';
+    input.focus();
+  }
+
+  // ============ ROLE SWITCHING ============
+  function setRole(role) {
+    currentRole = role;
+    if (role === 'seller') {
+      sellerPanel.style.display = 'block';
+      buyerPanel.style.display = 'none';
+      roleBadge.innerText = '👑 Seller Mode';
+      sellerRoleBtn.classList.add('active');
+      buyerRoleBtn.classList.remove('active');
+    } else {
+      sellerPanel.style.display = 'none';
+      buyerPanel.style.display = 'block';
+      roleBadge.innerText = '🛒 Buyer Mode';
+      buyerRoleBtn.classList.add('active');
+      sellerRoleBtn.classList.remove('active');
+    }
+    renderChat(); // Re-render chat to show correct alignment
+  }
+
+  // ============ FILE ATTACHMENT ============
+  document.getElementById('sellerFileInput').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file && file.size < 5e6) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        pendingTicketFile = { name: file.name, data: ev.target.result };
+        addSystemMessage(`📎 Ticket file ready: "${file.name}". Click "Send Ticket".`);
+      };
+      reader.readAsDataURL(file);
+    } else addSystemMessage('File too large (max 5MB).');
+    e.target.value = '';
+  });
+
+  document.getElementById('chatAttachBtn').addEventListener('click', () => {
+    if (currentRole === 'seller') {
+      addSystemMessage(`💡 Use the "Attach Ticket" button in Seller Controls to attach ticket files.`);
+    } else {
+      addSystemMessage(`💡 Only sellers can attach ticket files.`);
+    }
+  });
+
+  // ============ MODAL HANDLERS ============
+  document.getElementById('saveCreateModal').addEventListener('click', () => {
+    const name = document.getElementById('modalEventName').value;
+    const date = document.getElementById('modalEventDate').value;
+    const loc = document.getElementById('modalLocation').value;
+    const type = document.getElementById('modalTicketType').value;
+    const price = parseFloat(document.getElementById('modalPrice').value);
+    document.getElementById('previewEventName').innerText = name;
+    document.getElementById('previewTitle').innerText = name.includes('BTS') ? 'ARIRANG · LIVE' : 'EVENT';
+    document.getElementById('previewDate').innerText = date;
+    document.getElementById('previewLocation').innerText = loc;
+    document.getElementById('previewTicketType').innerText = type;
+    document.getElementById('displayPrice').innerText = price.toFixed(2);
+    document.getElementById('detailEvent').innerText = name;
+    currentPrice = price;
+    addSystemMessage(`🎫 New ticket created: ${name} (${type}) - ${currentCurrency} ${price}`);
+    document.getElementById('createTicketModal').classList.remove('active');
+  });
+  document.getElementById('closeCreateModal').addEventListener('click', () => document.getElementById('createTicketModal').classList.remove('active'));
+  document.getElementById('cancelCreateModal').addEventListener('click', () => document.getElementById('createTicketModal').classList.remove('active'));
+  document.getElementById('closeFundModal').addEventListener('click', () => document.getElementById('cryptoFundModal').classList.remove('active'));
+  document.getElementById('cancelFundModal').addEventListener('click', () => document.getElementById('cryptoFundModal').classList.remove('active'));
+  document.getElementById('confirmFundModal').addEventListener('click', processCryptoFund);
+  document.querySelectorAll('#cryptoOptionsList .crypto-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      document.querySelectorAll('#cryptoOptionsList .crypto-option').forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      selectedCrypto = opt.getAttribute('data-crypto');
+    });
+    if(opt.getAttribute('data-crypto') === 'ETH') opt.classList.add('selected');
+  });
+  document.getElementById('fundAmount').innerHTML = `$${currentPrice}`;
+
+  // ============ BUTTON CONNECTIONS ============
+  document.getElementById('sellerCreateTicketBtn').addEventListener('click', sellerCreateTicket);
+  document.getElementById('sellerConfirmPaymentBtn').addEventListener('click', sellerConfirmPayment);
+  document.getElementById('sellerAttachTicketBtn').addEventListener('click', sellerAttachTicket);
+  document.getElementById('sellerSendTicketBtn').addEventListener('click', sellerSendTicket);
+  document.getElementById('sellerResetBtn').addEventListener('click', sellerReset);
+  document.getElementById('buyerFundEscrowBtn').addEventListener('click', buyerFundEscrow);
+  document.getElementById('buyerConfirmReceiptBtn').addEventListener('click', buyerConfirmReceipt);
+  document.getElementById('sendMsgBtn').addEventListener('click', sendMessage);
+  document.getElementById('chatInput').addEventListener('keypress', (e) => { if(e.key === 'Enter') sendMessage(); });
+  sellerRoleBtn.addEventListener('click', () => setRole('seller'));
+  buyerRoleBtn.addEventListener('click', () => setRole('buyer'));
+
+  // Auto time
+  function updateLiveTime() { document.getElementById('liveTimeDisplay').innerText = new Date().toLocaleTimeString(); }
+  setInterval(updateLiveTime, 1000);
+  updateLiveTime();
+
+  // Initial state
+  setRole('seller');
+  updateEscrowUI();
+  addSystemMessage(`✨ Real-time chat active! Messages appear instantly for both Seller and Buyer views. Switch roles to see both perspectives.`);
+</script>
+</body>
+</html>
